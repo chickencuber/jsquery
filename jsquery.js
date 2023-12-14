@@ -72,6 +72,10 @@ const { $, JSQuery } = (() => {
       this.elt.addEventListener(e, func, s);
       return this;
     }
+    removeEvent(e, func, s) {
+      this.elt.removeEventListener(e, func, s);
+      return this;
+    }
     trigger(e) {
       this.elt.dispatchEvent(new Event(e));
       return this;
