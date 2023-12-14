@@ -231,6 +231,12 @@ const { $, JSQuery } = (() => {
     return body;
   };
 
+  let doc;
+  J.doc = () => {
+    if(!doc) doc = Element.from(document);
+    return doc;
+  }
+
   J.create = (t) => {
     return Element.from(document.createElement(t));
   };
