@@ -1,3 +1,3 @@
 a clone on jquery
-https://cdn.jsdelivr.net/gh/chickencuber/jsquery/jsquery.js
+https://cdn.jsdelivr.net/gh/chickencuber/jsquery@latest/jsquery.js
 docs: https://sites.google.com/view/jsquery/home
