@@ -50,7 +50,7 @@ const { $, JSQuery } = (() => {
 
   class Element {
     #TriggerEvent(e, func, s) {
-      if (func === undefined) {
+      if (!func) {
         this.trigger(e);
         return;
       }
