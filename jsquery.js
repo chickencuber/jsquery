@@ -155,6 +155,16 @@ const { $, JSQuery } = (() => {
       this.elt.textContent = val;
       return this;
     }
+    value(val) {
+      if (!val) return this.elt.value;
+      this.elt.value = val;
+      return this;
+    }
+    checked(val) {
+      if (!val) return this.elt.checked;
+      this.elt.checked = val;
+      return this;
+    }
     //events
     click(func, s) {
       this.#TriggerEvent("click", func, s);
