@@ -77,7 +77,7 @@ const { $, JSQuery } = (() => {
       return this;
     }
     trigger(e) {
-      this.elt.dispatchEvent(new Event(e));
+      this.elt[e]();
       return this;
     }
     css(styles) {
