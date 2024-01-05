@@ -99,7 +99,7 @@ const { $, JSQuery } = (() => {
       return this.elt.getAttribute(name);
     }
     id(val) {
-      if (!val) return this.getProp("id");
+      if (val == undefined) return this.getProp("id");
       this.props({ id: val });
       return this;
     }
@@ -146,22 +146,22 @@ const { $, JSQuery } = (() => {
       return this.constructor.from(this.elt.children);
     }
     html(val) {
-      if (!val) return this.elt.innerHTML;
+      if (val == undefined) return this.elt.innerHTML;
       this.elt.innerHTML = val;
       return this;
     }
     text(val) {
-      if (!val) return this.elt.textContent;
+      if (val == undefined) return this.elt.textContent;
       this.elt.textContent = val;
       return this;
     }
     value(val) {
-      if (!val) return this.elt.value;
+      if (val == undefined) return this.elt.value;
       this.elt.value = val;
       return this;
     }
     checked(val) {
-      if (!val) return this.elt.checked;
+      if (val == undefined) return this.elt.checked;
       this.elt.checked = val;
       return this;
     }
