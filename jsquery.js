@@ -274,7 +274,7 @@ const { $, JSQuery } = (() => {
   J.loadExtension = (extend, global = false) => {
     if (Object.getPrototypeOf(extend) !== Extension) {
       throw new Error(
-        "the class is not a parent of JSQuery.Extension or the inputed class is an instance"
+        "the class is not a child of JSQuery.Extension or the inputed class is an instance"
       );
     }
     body = undefined;
