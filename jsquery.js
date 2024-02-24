@@ -251,7 +251,25 @@ const { $, JSQuery } = (() => {
     return Element.from(document.createElement(t));
   };
 
-  const JSQuery = { Element, ElementArray, Extension };
+  const JSQuery = { Element, ElementArray, Extension, Caching: class Caching extends JSQuery.Extension {
+    $() {
+      return {
+        cache(func) {
+          const f = (...args) => {
+            const val = JSON.stringify(args);
+            if(f.cache.hasOwnProperty(val)) {
+              return f.cache[val];
+            }
+            const temp = func(...args);
+            f.cache[val] = temp;
+            return temp;
+          }
+          f.cache = {};
+          return f;
+        }
+      }
+    }
+  } };
 
   J.loadExtension = (extend, global = false) => {
     if (Object.getPrototypeOf(extend) !== Extension) {
