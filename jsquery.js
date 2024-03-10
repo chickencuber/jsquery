@@ -243,7 +243,7 @@ const { $, JSQuery } = (() => {
 
   let doc;
   J.doc = () => {
-    if(!doc) doc = Element.from(document);
+    if (!doc) doc = Element.from(document);
     return doc;
   }
 
@@ -251,25 +251,131 @@ const { $, JSQuery } = (() => {
     return Element.from(document.createElement(t));
   };
 
-  const JSQuery = { Element, ElementArray, Extension, Caching: class Caching extends Extension {
-    $() {
-      return {
-        cache(func) {
-          const f = (...args) => {
-            const val = JSON.stringify(args);
-            if(f.cache.hasOwnProperty(val)) {
-              return f.cache[val];
+  const JSQuery = {
+    Element, ElementArray, Extension, Plugin: Extension, Caching: class Caching extends Extension {
+      $() {
+        return {
+          cache(func) {
+            const f = (...args) => {
+              const val = JSON.stringify(args);
+              if (f.cache.hasOwnProperty(val)) {
+                return f.cache[val];
+              }
+              const temp = func(...args);
+              f.cache[val] = temp;
+              return temp;
             }
-            const temp = func(...args);
-            f.cache[val] = temp;
-            return temp;
+            f.cache = {};
+            return f;
           }
-          f.cache = {};
-          return f;
         }
       }
+    }, CustomElements: class CustomElements extends Extension {
+      JSQuery() {
+        return {
+          Styles: class {
+            static from(v) {
+              return new this(v);
+            }
+            constructor(val) {
+              for (const [k, v] of Object.entries(val)) {
+                if (!isFinite(parseInt(k))) {
+                  this[k] = v;
+                }
+              }
+            }
+          },
+        };
+      }
+      Element() {
+        return {
+          getComputedStyles() {
+            return JSQuery.Styles.from(window.getComputedStyle(this.elt));
+          },
+        };
+      }
+      $() {
+        return {
+          custom(name, creator) {
+            let c;
+            class Custom extends HTMLElement {
+              constructor() {
+                super();
+                const shadow = $.from(this.attachShadow({ mode: "open" })).child(
+                  (c = creator($.from(this)))
+                );
+                const observer = new MutationObserver(() => {
+                  c.remove();
+                  shadow.child((c = creator($.from(this))));
+                });
+                observer.observe(this, {
+                  attributes: true,
+                  childList: true,
+                  subtree: true,
+                });
+              }
+            }
+            customElements.define(name, Custom);
+          },
+        };
+      }
+    },
+    Draggable: class Draggable extends Extension {
+      ElementArray() {
+        return {
+          drag(bool) {
+            this.forEach(v => v.drag(bool));
+            return this;
+          },
+        };
+      }
+      Element() {
+        let mouseDown = false;
+
+        return {
+          drag(bool = !this.hasClass("draggable")) {
+            const change = { x: 0, y: 0 };
+            const mousedown = ({ clientX: x, clientY: y }) => {
+              if (mouseDown) return;
+              const pos = this.elt.getBoundingClientRect();
+              change.x = pos.left - x;
+              change.y = pos.top - y;
+              mouseDown = true;
+              $.doc().on("mousemove", mousedrag);
+              $.doc().on("mouseup", mouseup);
+            };
+
+            const mousedrag = ({ clientX: x, clientY: y }) => {
+              this.css({
+                position: "absolute",
+                top: `${y + change.y}px`,
+                left: `${x + change.x}px`,
+              });
+            };
+
+            const mouseup = () => {
+              mouseDown = false;
+              $.doc().removeEvent("mousemove", mousedrag);
+              $.doc().removeEvent("mouseup", mouseup);
+            };
+            if (bool) {
+              this.class("draggable")
+            } else {
+              this.removeClass("draggable")
+            }
+            const self = this;
+            if (bool) {
+              this.on("mousedown", mousedown);
+            } else {
+              this.removeEvent("mousedown", mousedown);
+            }
+            return this;
+          },
+        };
+      }
     }
-  } };
+
+  };
 
   J.loadExtension = (extend, global = false) => {
     if (Object.getPrototypeOf(extend) !== Extension) {
@@ -298,6 +404,8 @@ const { $, JSQuery } = (() => {
       Object.assign(ElementArray, items.static_ElementArray);
     }
   };
+
+  J.loadPlugin = J.loadExtension;
 
   return { $: J, JSQuery };
 })();
