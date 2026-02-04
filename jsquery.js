@@ -110,7 +110,11 @@ const { $, JSQuery } = (() => {
         }
         props(props) {
             for (const [name, val] of Object.entries(props)) {
-                this.elt.setAttribute(name, val);
+                if(val === null) {
+                    this.elt.removeAttribute(name);
+                } else {
+                    this.elt.setAttribute(name, val);
+                }
             }
             return this;
         }
